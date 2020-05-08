@@ -9,16 +9,51 @@ import { Route, Link, Switch, BrowserRouter as Router } from 'react-router-dom'
 import SVG from './SVG'
 import Polygon from './Polygon';
 
-// Polygon utilites
+// Grids
+import SquareGrid from './SquareGrid'
+import HexGridFlat from './HexGridFlat';
+import HexGridFlatLabels from './HexGridFlatLabels';
 
-import * as polygonUtils from './PolygonUtils'
+// Import maps
+import * as basicMap from './data/maps/Basic'
 
 
+// Set the basics of the map
+let {nx,ny,origin,edgelength} = basicMap.mapDims;
 
+let initialhexes=basicMap.initialhexes
+
+
+let initialState={
+  hexes: initialhexes,
+};
 
 
 
 class App extends Component {
+
+  state=initialState;
+
+
+  // change hex color on entering with mouse
+
+  handleHexEnter = (i) => {
+    const hexes=this.state.hexes;
+    hexes[i].fill='white';
+    this.setState({
+      hexes: hexes,
+    })
+  }
+
+  // change hex color on entering with mouse
+
+  handleHexLeave = (i) => {
+    const hexes=this.state.hexes;
+    hexes[i].fill='brown';
+    this.setState({
+      hexes: hexes,
+    })
+  }
 
 
   render() {
@@ -32,16 +67,25 @@ class App extends Component {
       <div className="container">
      
         <h1>Polygons</h1>
-       
-          <div>
-          <SVG >
-          {/* <Polygon vertices={[[0,0], [50,0], [50,50], [0,50]]} style={{fill: 'purple', stroke: 'black'}} /> */}
-          {/* <Polygon vertices={[[0,10],[-7,7],[-10,0],[-7,-7]]} style={{fill: 'purple', stroke: 'black'}}/> */}
-          {/* <Polygon vertices={polygonUtils.polygonVerticesFlatBottom(100,100,6,50)} style={{fill: 'purple', stroke: 'black'}}/>
-          <Polygon center={[100,100]} n={6} vertexlength={10} style={{fill: 'purple', stroke: 'black'}}/> */}
-          <Polygon center={[100,100]} n={6} vertexlength={50} style={{fill: 'purple', stroke: 'black'}}/> 
+        <div>
+          <SVG height={1000} width={1000}>
+          {this.state.hexes.map((item,i)=>{
+  return (
+    <Polygon key={item.center}
+     center={item.center}
+      n={6}
+      edgelength={item.edgelength}
+      style={{fill: item.fill,stroke: item.stroke, strokeWidth: item.strokeWidth}}
+      onMouseEnter={() => this.handleHexEnter(i)}
+      onMouseLeave={() => this.handleHexLeave(i)}
+      /> //{...props} allows us to pass through, e.g., style props to the SVG
+        );
+          })};
+          <HexGridFlatLabels nx={nx} ny={ny} edgelength={edgelength} origin={origin} />
           </SVG>
-          </div>
+          
+        </div>
+
 
 
       </div>

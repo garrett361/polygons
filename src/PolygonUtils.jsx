@@ -78,3 +78,62 @@ export let polygonVerticesFlatBottom = (center,n,vertexlength) =>{
 
     return shiftedvertices;
 };
+
+
+// array containing locations of points on rectangular grid
+export let squareGrid = (nx,ny,dx,dy,origin) => {
+    
+    let gridpoints=[origin];
+    let xvec=[dx,0];
+    let yvec=[0,dy];
+
+    for (var j=0; j<ny; j++) {
+        for(var i=0; i<nx-1; i++) {
+        gridpoints.push(vectoradd(gridpoints[gridpoints.length-1],xvec));
+        };
+        if (j!==ny-1){
+        gridpoints.push(vectoradd(gridpoints[gridpoints.length-nx],yvec));
+        };
+    };
+
+      return gridpoints;
+
+}; 
+
+
+// Outputs an array with center locations for plane-filling flat-topped hexes
+// Using double coordinates as in https://www.redblobgames.com/grids/hexagons/
+// center: a two-component vector labeling the center of the polygon
+// n: number of sides for the polygon (n-gon)
+// sidelength: lenth of any one edge of the polygon
+// vertexlength: length of vector from center to any one of the polygon's vertices; used if edgelenth not provided
+export let hexGridFlat = (nx,ny,origin,edgelength,vertexlength) => {
+
+
+    let hexhalfangle=1/3*Math.PI;
+    
+    if (edgelength) {
+        var dy=edgelength*Math.tan(hexhalfangle)/2;
+        var dx=edgelength+edgelength/Math.cos(hexhalfangle);
+    } else {
+        var dy=vertexlength*Math.sin(hexhalfangle);
+        var dx=2*vertexlength+2*Math.cos(hexhalfangle)*vertexlength;
+    }
+
+    let squaregridpoints=squareGrid(nx,ny,dx,dy,origin);
+
+    let xvecoffset=[dx/2,0];
+
+    let hexgridpoints=squaregridpoints.map((e,i)=>{
+        if (i%(2*nx)<nx) {
+             return e;
+        } else {
+            return vectoradd(e,xvecoffset);
+        }; 
+    })
+    
+    return hexgridpoints;
+
+}; 
+
+
